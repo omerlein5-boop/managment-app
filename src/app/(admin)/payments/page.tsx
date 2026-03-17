@@ -42,8 +42,8 @@ export default function PaymentsPage() {
 
   async function markPaid(paymentId: string) {
     const method = prompt('אמצעי תשלום (bit/cash/transfer/credit_card):') ?? 'bit'
-    await supabase
-      .from('payments')
+    await (supabase
+      .from('payments') as any)
       .update({
         status: 'paid',
         payment_method: method,

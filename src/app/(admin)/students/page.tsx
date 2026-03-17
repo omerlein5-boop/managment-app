@@ -31,7 +31,7 @@ export default async function StudentsPage({
     query = query.or(`full_name.ilike.%${q}%,phone.ilike.%${q}%`)
   }
 
-  const { data: clients } = await query
+  const { data: clients } = await query as { data: any[] | null }
 
   const today = format(new Date(), 'yyyy-MM-dd')
 

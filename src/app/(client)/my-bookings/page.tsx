@@ -28,7 +28,7 @@ export default function MyBookingsPage() {
       .from('clients')
       .select('id')
       .eq('profile_id', user.id)
-      .single()
+      .single() as { data: any | null }
 
     if (!client) { setLoading(false); return }
 
@@ -60,8 +60,8 @@ export default function MyBookingsPage() {
     if (!confirm('האם לבטל את ההזמנה?')) return
 
     setCanceling(bookingId)
-    await supabase
-      .from('bookings')
+    await (supabase
+      .from('bookings') as any)
       .update({
         status: 'canceled',
         canceled_at: new Date().toISOString(),

@@ -24,7 +24,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
       )
     `)
     .eq('id', id)
-    .single()
+    .single() as { data: any | null }
 
   if (!session) notFound()
 
@@ -42,7 +42,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   const { data: attendanceRecords } = await supabase
     .from('attendance')
     .select('*')
-    .eq('session_id', id)
+    .eq('session_id', id) as { data: any[] | null }
 
   return (
     <div className="p-4 lg:p-6 max-w-2xl mx-auto">

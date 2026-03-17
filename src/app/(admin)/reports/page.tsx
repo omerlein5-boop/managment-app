@@ -30,26 +30,26 @@ export default async function ReportsPage() {
       .select('amount')
       .eq('status', 'paid')
       .gte('paid_at', thisMonthStart)
-      .lte('paid_at', thisMonthEnd),
+      .lte('paid_at', thisMonthEnd) as any,
 
     supabase
       .from('payments')
       .select('amount')
       .eq('status', 'paid')
       .gte('paid_at', lastMonthStart)
-      .lte('paid_at', lastMonthEnd),
+      .lte('paid_at', lastMonthEnd) as any,
 
     supabase
       .from('client_memberships')
       .select('id', { count: 'exact' })
       .eq('status', 'active')
       .lte('starts_at', today)
-      .gte('ends_at', today),
+      .gte('ends_at', today) as any,
 
     supabase
       .from('clients')
       .select('id', { count: 'exact' })
-      .eq('is_active', true),
+      .eq('is_active', true) as any,
 
     // Revenue by description (approximation for type)
     supabase
@@ -57,14 +57,14 @@ export default async function ReportsPage() {
       .select('amount, description')
       .eq('status', 'paid')
       .gte('paid_at', thisMonthStart)
-      .lte('paid_at', thisMonthEnd),
+      .lte('paid_at', thisMonthEnd) as any,
 
     // Attendance this month
     supabase
       .from('attendance')
       .select('status')
       .gte('marked_at', thisMonthStart)
-      .lte('marked_at', thisMonthEnd),
+      .lte('marked_at', thisMonthEnd) as any,
 
     // Session fill rate this month
     supabase
@@ -72,33 +72,33 @@ export default async function ReportsPage() {
       .select('capacity, bookings ( status )')
       .gte('starts_at', thisMonthStart)
       .lte('starts_at', thisMonthEnd)
-      .neq('status', 'canceled'),
+      .neq('status', 'canceled') as any,
 
     supabase
       .from('payments')
       .select('amount')
-      .eq('status', 'unpaid'),
+      .eq('status', 'unpaid') as any,
   ])
 
-  const thisRevenue = (thisMonthRevenue.data ?? []).reduce((s, p) => s + p.amount, 0)
-  const lastRevenue = (lastMonthRevenue.data ?? []).reduce((s, p) => s + p.amount, 0)
+  const thisRevenue = ((thisMonthRevenue as any).data ?? []).reduce((s: number, p: any) => s + p.amount, 0)
+  const lastRevenue = ((lastMonthRevenue as any).data ?? []).reduce((s: number, p: any) => s + p.amount, 0)
   const revenueDiff = lastRevenue > 0 ? Math.round(((thisRevenue - lastRevenue) / lastRevenue) * 100) : 0
 
-  const totalAttendance = attendanceStats.data?.length ?? 0
-  const presentCount = attendanceStats.data?.filter((a) => a.status === 'present').length ?? 0
+  const totalAttendance = (attendanceStats as any).data?.length ?? 0
+  const presentCount = (attendanceStats as any).data?.filter((a: any) => a.status === 'present').length ?? 0
   const attendanceRate = totalAttendance > 0 ? Math.round((presentCount / totalAttendance) * 100) : 0
 
-  const sessions = sessionFillRate.data ?? []
+  const sessions = (sessionFillRate as any).data ?? []
   const avgFillRate = sessions.length > 0
     ? Math.round(
-        sessions.reduce((sum, s: any) => {
+        sessions.reduce((sum: number, s: any) => {
           const confirmed = s.bookings?.filter((b: any) => b.status === 'confirmed').length ?? 0
           return sum + (confirmed / Math.max(s.capacity, 1)) * 100
         }, 0) / sessions.length
       )
     : 0
 
-  const unpaidBalance = (unpaidTotal.data ?? []).reduce((s, p) => s + p.amount, 0)
+  const unpaidBalance = ((unpaidTotal as any).data ?? []).reduce((s: number, p: any) => s + p.amount, 0)
 
   const monthLabel = format(now, 'MMMM yyyy', { locale: he })
   const lastMonthLabel = format(subMonths(now, 1), 'MMMM yyyy', { locale: he })

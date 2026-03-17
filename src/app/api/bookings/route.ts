@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     .from('sessions')
     .select('*, session_types ( type ), bookings ( id, client_id, status )')
     .eq('id', session_id)
-    .single()
+    .single() as { data: any | null }
 
   if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 })
   if (session.status === 'canceled') {
@@ -62,10 +62,10 @@ export async function POST(request: Request) {
       .from('waitlist_entries')
       .select('id', { count: 'exact' })
       .eq('session_id', session_id)
-      .eq('status', 'waiting')
+      .eq('status', 'waiting') as { count: number | null }
 
-    const { data: waitlistEntry, error: wErr } = await supabase
-      .from('waitlist_entries')
+    const { data: waitlistEntry, error: wErr } = await (supabase
+      .from('waitlist_entries') as any)
       .insert({ session_id, client_id, position: (count ?? 0) + 1 })
       .select()
       .single()
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single() as { data: any | null }
 
     // Skip checks for admins
     if (profile?.role === 'client') {
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
         .from('clients')
         .select('id')
         .eq('profile_id', user.id)
-        .single()
+        .single() as { data: any | null }
 
       if (client) {
         const today = new Date().toISOString().split('T')[0]
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
           .eq('status', 'active')
           .lte('starts_at', today)
           .gte('ends_at', today)
-          .single()
+          .single() as { data: any | null }
 
         if (!mem) {
           return NextResponse.json(
@@ -135,8 +135,8 @@ export async function POST(request: Request) {
   }
 
   // Create booking
-  const { data, error } = await supabase
-    .from('bookings')
+  const { data, error } = await (supabase
+    .from('bookings') as any)
     .insert({
       session_id,
       client_id,

@@ -19,7 +19,7 @@ export default async function ClientHomePage() {
     .from('clients')
     .select('*')
     .eq('profile_id', user.id)
-    .single()
+    .single() as { data: any | null }
 
   if (!client) {
     return (
@@ -49,7 +49,7 @@ export default async function ClientHomePage() {
     .eq('status', 'confirmed')
     .gte('sessions.starts_at', new Date().toISOString())
     .order('sessions.starts_at')
-    .limit(3)
+    .limit(3) as { data: any[] | null }
 
   // Get active membership
   const { data: membership } = await supabase
@@ -59,7 +59,7 @@ export default async function ClientHomePage() {
     .eq('status', 'active')
     .lte('starts_at', today)
     .gte('ends_at', today)
-    .single()
+    .single() as { data: any | null }
 
   // Count group bookings this week
   const weekStart = new Date()
@@ -73,7 +73,7 @@ export default async function ClientHomePage() {
     .eq('status', 'confirmed')
     .eq('sessions.session_types.type', 'group')
     .gte('sessions.starts_at', weekStart.toISOString())
-    .lt('sessions.starts_at', weekEnd.toISOString())
+    .lt('sessions.starts_at', weekEnd.toISOString()) as { count: number | null }
 
   const maxWeekly = membership?.membership_plans?.sessions_per_week ?? 2
   const weeklyUsed = weeklyGroupCount ?? 0

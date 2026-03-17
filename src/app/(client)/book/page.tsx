@@ -40,7 +40,7 @@ export default function BookPage() {
       .from('clients')
       .select('id')
       .eq('profile_id', user.id)
-      .single()
+      .single() as { data: any | null }
 
     const cid = clientData?.id
     setClientId(cid ?? null)
@@ -147,9 +147,9 @@ export default function BookPage() {
             .from('waitlist_entries')
             .select('id', { count: 'exact' })
             .eq('session_id', selectedSession.id)
-            .eq('status', 'waiting')
+            .eq('status', 'waiting') as { count: number | null }
 
-          await supabase.from('waitlist_entries').insert({
+          await (supabase.from('waitlist_entries') as any).insert({
             session_id: selectedSession.id,
             client_id: clientId,
             position: (count ?? 0) + 1,
@@ -162,7 +162,7 @@ export default function BookPage() {
       }
 
       // Book!
-      const { error } = await supabase.from('bookings').insert({
+      const { error } = await (supabase.from('bookings') as any).insert({
         session_id: selectedSession.id,
         client_id: clientId,
         status: 'confirmed',
@@ -179,7 +179,7 @@ export default function BookPage() {
         return
       }
 
-      setMyBookingIds((prev) => new Set([...prev, selectedSession.id]))
+      setMyBookingIds((prev) => new Set(Array.from(prev).concat(selectedSession.id)))
       setStep('success')
     } catch (err: any) {
       setBookingError(err.message ?? 'שגיאה בהזמנה')

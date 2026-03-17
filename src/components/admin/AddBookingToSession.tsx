@@ -44,7 +44,7 @@ export default function AddBookingToSession({ sessionId }: { sessionId: string }
   async function addClient(clientId: string) {
     setSaving(clientId)
     try {
-      const { error } = await supabase.from('bookings').insert({
+      const { error } = await (supabase.from('bookings') as any).insert({
         session_id: sessionId,
         client_id: clientId,
         status: 'confirmed',

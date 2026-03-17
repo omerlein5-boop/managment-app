@@ -50,13 +50,13 @@ export default function StudentForm({ client, onSuccess, onCancel }: StudentForm
       }
 
       if (client) {
-        const { error } = await supabase
-          .from('clients')
+        const { error } = await (supabase
+          .from('clients') as any)
           .update(payload)
           .eq('id', client.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('clients').insert(payload)
+        const { error } = await (supabase.from('clients') as any).insert(payload)
         if (error) throw error
       }
 

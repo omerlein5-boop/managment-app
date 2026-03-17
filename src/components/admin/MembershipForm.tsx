@@ -26,11 +26,11 @@ export default function MembershipForm({ clientId, onSuccess, onCancel }: Member
   const supabase = createClient()
 
   useEffect(() => {
-    supabase
-      .from('membership_plans')
+    ;(supabase
+      .from('membership_plans') as any)
       .select('*')
       .eq('is_active', true)
-      .then(({ data }) => {
+      .then(({ data }: { data: any[] | null }) => {
         setPlans(data ?? [])
         if (data?.[0]) {
           setSelectedPlan(data[0])
@@ -61,7 +61,7 @@ export default function MembershipForm({ clientId, onSuccess, onCancel }: Member
       const starts = new Date(form.starts_at)
       const ends = addDays(starts, selectedPlan?.validity_days ?? 30)
 
-      const { error } = await supabase.from('client_memberships').insert({
+      const { error } = await (supabase.from('client_memberships') as any).insert({
         client_id: clientId,
         plan_id: form.plan_id,
         starts_at: form.starts_at,
@@ -75,7 +75,7 @@ export default function MembershipForm({ clientId, onSuccess, onCancel }: Member
       if (error) throw error
 
       // Also create a payment record
-      await supabase.from('payments').insert({
+      await (supabase.from('payments') as any).insert({
         client_id: clientId,
         amount: Number(form.price_paid),
         status: 'unpaid',  // Admin will mark it paid separately

@@ -41,13 +41,13 @@ export default function SessionForm({ defaultDate, onSuccess, onCancel, session 
   useEffect(() => {
     async function load() {
       const [typesRes, locsRes] = await Promise.all([
-        supabase.from('session_types').select('*').eq('is_active', true),
-        supabase.from('locations').select('*').eq('is_active', true),
+        supabase.from('session_types').select('*').eq('is_active', true) as any,
+        supabase.from('locations').select('*').eq('is_active', true) as any,
       ])
-      setSessionTypes(typesRes.data ?? [])
-      setLocations(locsRes.data ?? [])
-      if (!form.session_type_id && typesRes.data?.[0]) {
-        setForm((f) => ({ ...f, session_type_id: typesRes.data![0].id }))
+      setSessionTypes((typesRes as any).data ?? [])
+      setLocations((locsRes as any).data ?? [])
+      if (!form.session_type_id && (typesRes as any).data?.[0]) {
+        setForm((f) => ({ ...f, session_type_id: (typesRes as any).data[0].id }))
       }
     }
     load()
@@ -89,8 +89,8 @@ export default function SessionForm({ defaultDate, onSuccess, onCancel, session 
 
       if (session) {
         // Edit mode
-        const { error } = await supabase
-          .from('sessions')
+        const { error } = await (supabase
+          .from('sessions') as any)
           .update({
             session_type_id: form.session_type_id,
             location_id: form.location_id || null,
@@ -102,7 +102,7 @@ export default function SessionForm({ defaultDate, onSuccess, onCancel, session 
           .eq('id', session.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('sessions').insert(sessionsToCreate)
+        const { error } = await (supabase.from('sessions') as any).insert(sessionsToCreate)
         if (error) throw error
       }
 

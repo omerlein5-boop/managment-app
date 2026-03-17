@@ -18,7 +18,7 @@ export async function GET(request: Request) {
           getAll() {
             return cookieStore.getAll()
           },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
             )
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .single()
+          .single() as { data: any | null }
 
         if (profile?.role === 'admin' || profile?.role === 'coach') {
           return NextResponse.redirect(`${origin}/dashboard`)

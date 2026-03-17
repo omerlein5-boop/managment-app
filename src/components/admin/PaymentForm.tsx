@@ -48,7 +48,7 @@ export default function PaymentForm({
     setError('')
 
     try {
-      const { error } = await supabase.from('payments').insert({
+      const { error } = await (supabase.from('payments') as any).insert({
         client_id: clientId,
         amount: Number(form.amount),
         status: form.status,

@@ -20,7 +20,7 @@ export async function PATCH(
     .from('bookings')
     .select('*, sessions ( starts_at )')
     .eq('id', id)
-    .single()
+    .single() as { data: any | null }
 
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
@@ -29,7 +29,7 @@ export async function PATCH(
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .single() as { data: any | null }
 
   if (profile?.role === 'client' && status === 'canceled') {
     const sessionStart = parseISO(booking.sessions?.starts_at)
@@ -49,8 +49,8 @@ export async function PATCH(
     update.cancellation_reason = cancellation_reason ?? null
   }
 
-  const { data, error } = await supabase
-    .from('bookings')
+  const { data, error } = await (supabase
+    .from('bookings') as any)
     .update(update)
     .eq('id', id)
     .select()
@@ -66,18 +66,18 @@ export async function PATCH(
       .eq('session_id', booking.session_id)
       .eq('status', 'waiting')
       .order('position')
-      .limit(1)
+      .limit(1) as { data: any[] | null }
 
     if (waitlisted && waitlisted.length > 0) {
       const first = waitlisted[0]
-      await supabase.from('bookings').insert({
+      await (supabase.from('bookings') as any).insert({
         session_id: booking.session_id,
         client_id: first.client_id,
         status: 'confirmed',
         booked_by: 'admin',
       })
-      await supabase
-        .from('waitlist_entries')
+      await (supabase
+        .from('waitlist_entries') as any)
         .update({ status: 'promoted' })
         .eq('id', first.id)
     }
@@ -99,7 +99,7 @@ export async function DELETE(
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .single() as { data: any | null }
 
   if (!profile || !['admin', 'coach'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

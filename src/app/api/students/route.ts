@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .single() as { data: any | null }
 
   if (!profile || !['admin', 'coach'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -51,8 +51,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'full_name and phone required' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
-    .from('clients')
+  const { data, error } = await (supabase
+    .from('clients') as any)
     .insert({ full_name, phone, email, goals, injuries, notes })
     .select()
     .single()

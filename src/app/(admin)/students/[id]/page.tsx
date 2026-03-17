@@ -26,7 +26,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
       )
     `)
     .eq('id', id)
-    .single()
+    .single() as { data: any | null }
 
   if (!client) notFound()
 
@@ -54,13 +54,13 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     .select('status, marked_at, sessions ( starts_at, session_types ( name_he ) )')
     .eq('client_id', id)
     .order('marked_at', { ascending: false })
-    .limit(10)
+    .limit(10) as { data: any[] | null }
 
   const { data: notes } = await supabase
     .from('notes')
     .select('*, profiles ( full_name )')
     .eq('client_id', id)
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false }) as { data: any[] | null }
 
   const membershipStatus = activeMembership
     ? getMembershipStatusLabel('active')

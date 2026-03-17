@@ -33,7 +33,7 @@ async function getDashboardData() {
       .gte('starts_at', dayStart)
       .lte('starts_at', dayEnd)
       .neq('status', 'canceled')
-      .order('starts_at'),
+      .order('starts_at') as any,
 
     // Active members count
     supabase
@@ -41,7 +41,7 @@ async function getDashboardData() {
       .select('id', { count: 'exact' })
       .eq('status', 'active')
       .lte('starts_at', format(today, 'yyyy-MM-dd'))
-      .gte('ends_at', format(today, 'yyyy-MM-dd')),
+      .gte('ends_at', format(today, 'yyyy-MM-dd')) as any,
 
     // Unpaid payments
     supabase
@@ -49,7 +49,7 @@ async function getDashboardData() {
       .select('id, amount, clients ( full_name )', { count: 'exact' })
       .eq('status', 'unpaid')
       .order('created_at', { ascending: false })
-      .limit(5),
+      .limit(5) as any,
 
     // Monthly revenue
     supabase
@@ -57,7 +57,7 @@ async function getDashboardData() {
       .select('amount')
       .eq('status', 'paid')
       .gte('paid_at', monthStart)
-      .lte('paid_at', monthEnd),
+      .lte('paid_at', monthEnd) as any,
 
     // Upcoming bookings (next 7 days)
     supabase
@@ -71,18 +71,18 @@ async function getDashboardData() {
       .eq('status', 'confirmed')
       .gte('sessions.starts_at', today.toISOString())
       .order('sessions.starts_at')
-      .limit(8),
+      .limit(8) as any,
   ])
 
-  const revenue = monthlyRevenue.data?.reduce((sum, p) => sum + p.amount, 0) ?? 0
+  const revenue = (monthlyRevenue as any).data?.reduce((sum: number, p: any) => sum + p.amount, 0) ?? 0
 
   return {
-    todaySessions: todaySessions.data ?? [],
-    activeMembersCount: activeMembers.count ?? 0,
-    unpaidPayments: unpaidPayments.data ?? [],
-    unpaidCount: unpaidPayments.count ?? 0,
+    todaySessions: (todaySessions as any).data ?? [],
+    activeMembersCount: (activeMembers as any).count ?? 0,
+    unpaidPayments: (unpaidPayments as any).data ?? [],
+    unpaidCount: (unpaidPayments as any).count ?? 0,
     monthlyRevenue: revenue,
-    upcomingBookings: upcomingBookings.data ?? [],
+    upcomingBookings: (upcomingBookings as any).data ?? [],
   }
 }
 

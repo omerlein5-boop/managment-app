@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .single() as { data: any | null }
 
   if (!profile || !['admin', 'coach'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -43,8 +43,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'client_id and amount required' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
-    .from('payments')
+  const { data, error } = await (supabase
+    .from('payments') as any)
     .insert({
       client_id,
       amount: Number(amount),
@@ -72,8 +72,8 @@ export async function PATCH(request: Request) {
   const body = await request.json()
   const { id, status: payStatus, payment_method, paid_at } = body
 
-  const { data, error } = await supabase
-    .from('payments')
+  const { data, error } = await (supabase
+    .from('payments') as any)
     .update({
       status: payStatus,
       payment_method,

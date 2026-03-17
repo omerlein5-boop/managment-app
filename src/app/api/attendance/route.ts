@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single()
+    .single() as { data: any | null }
 
   if (!profile || !['admin', 'coach'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -38,17 +38,17 @@ export async function POST(request: Request) {
 
   let data, error
   if (existing) {
-    const res = await supabase
-      .from('attendance')
+    const res = await (supabase
+      .from('attendance') as any)
       .update({ status, notes: notes ?? null, marked_by: user.id, marked_at: new Date().toISOString() })
-      .eq('id', existing.id)
+      .eq('id', (existing as any).id)
       .select()
       .single()
     data = res.data
     error = res.error
   } else {
-    const res = await supabase
-      .from('attendance')
+    const res = await (supabase
+      .from('attendance') as any)
       .insert({
         session_id,
         client_id,

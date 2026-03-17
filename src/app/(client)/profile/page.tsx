@@ -31,7 +31,7 @@ export default function ProfilePage() {
         .from('clients')
         .select('*')
         .eq('profile_id', user.id)
-        .single(),
+        .single() as any,
     ])
 
     const c = clientRes.data
@@ -47,12 +47,12 @@ export default function ProfilePage() {
           .eq('status', 'active')
           .lte('starts_at', today)
           .gte('ends_at', today)
-          .single(),
+          .single() as any,
         supabase
           .from('payments')
           .select('*')
           .eq('client_id', c.id)
-          .eq('status', 'unpaid'),
+          .eq('status', 'unpaid') as any,
       ])
       setMembership(memRes.data)
       setUnpaidPayments(payRes.data ?? [])

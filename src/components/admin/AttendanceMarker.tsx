@@ -34,15 +34,15 @@ export default function AttendanceMarker({
         .select('id')
         .eq('session_id', sessionId)
         .eq('client_id', clientId)
-        .single()
+        .single() as { data: any | null }
 
       if (existing) {
-        await supabase
-          .from('attendance')
+        await (supabase
+          .from('attendance') as any)
           .update({ status: newStatus })
           .eq('id', existing.id)
       } else {
-        await supabase.from('attendance').insert({
+        await (supabase.from('attendance') as any).insert({
           session_id: sessionId,
           client_id: clientId,
           booking_id: bookingId,
