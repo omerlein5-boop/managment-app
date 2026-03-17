@@ -36,7 +36,7 @@ export default async function BookingsPage({
     query = query.eq('status', filter)
   }
 
-  const { data: bookings } = await query
+  const { data: bookings } = await query as { data: any[] | null }
 
   // Group by session
   const sessionMap = new Map<string, { session: any; bookings: any[] }>()
